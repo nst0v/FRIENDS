@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d0f12" />
+    <meta
+      name="description"
+      content="СОБРАЛИСЬ. — личный штаб встреч, игр, кино и барных вылазок для компании друзей."
+    />
+    <title>СОБРАЛИСЬ. — штаб своих</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">К содержимому</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top" aria-label="СОБРАЛИСЬ. — на главную">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 4v5M3.5 6.5h5M18 15v5M15.5 17.5h5M14.5 3l1 2.5L18 6.5l-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1L14.5 3Z" />
+              <circle cx="7.5" cy="16.5" r="3.5" />
+            </svg>
+          </span>
+          <span>СОБРАЛИСЬ<span class="brand-dot">.</span></span>
+        </a>
+
+        <nav class="main-nav" aria-label="Основная навигация">
+          <a href="#activities">Движи</a>
+          <a href="#crew">Банда</a>
+          <a href="#how-it-works">Как работает</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="user-button" id="user-button" type="button" aria-label="Выбрать, кто вы">
+            <span class="mini-avatar" id="header-avatar" aria-hidden="true">Н</span>
+            <span class="user-button-copy">
+              <small>Вы сейчас</small>
+              <strong id="header-user-name">Никита</strong>
+            </span>
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" />
+            </svg>
+          </button>
+          <button class="icon-button" id="data-button" type="button" aria-label="Данные и резервная копия">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16M7 12h10M9 17h6" />
+            </svg>
+          </button>
+          <button class="button button-primary header-create" data-action="create" type="button">
+            <span aria-hidden="true">＋</span> Новый движ
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero" id="top">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> Частный клуб на 11 человек</p>
+            <h1>Хватит писать<br /><em>«надо собраться».</em></h1>
+            <p class="hero-lead">
+              Выбираем повод, время и тех, кто снова скажет «я на часик».
+              Игры, кино, пиво — всё в одном штабе.
+            </p>
+            <div class="hero-actions">
+              <button class="button button-primary button-large" data-action="create" type="button">
+                Запланировать движ
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M4 10h12M11 5l5 5-5 5" />
+                </svg>
+              </button>
+              <button class="button button-ghost button-large" id="random-idea" type="button">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M3 6h2.5c3 0 3.5 8 7 8H17M14 11l3 3-3 3M3 14h2.5c1.3 0 2.1-1.5 2.8-3.2M13 6h4M14 3l3 3-3 3" />
+                </svg>
+                Подкинуть идею
+              </button>
+            </div>
+            <p class="hero-footnote">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              Сохраняется на этом устройстве. Без регистрации и занудства.
+            </p>
+          </div>
+
+          <div class="next-event-wrap" aria-live="polite">
+            <div class="ticket-label">БЛИЖАЙШИЙ СБОР <span>↘</span></div>
+            <article class="next-ticket" id="next-event">
+              <div class="ticket-empty">
+                <span class="ticket-empty-icon">✦</span>
+                <h2>Пока тихо</h2>
+                <p>Подозрительно тихо. Создайте первый движ.</p>
+                <button class="button button-dark" data-action="create" type="button">Исправить это</button>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="container">
+          <div class="club-strip" aria-label="Статистика клуба">
+            <div><strong>11</strong><span>своих людей</span></div>
+            <i aria-hidden="true">✦</i>
+            <div><strong id="upcoming-count">0</strong><span>ближайших движей</span></div>
+            <i aria-hidden="true">✦</i>
+            <div><strong>∞</strong><span>причин собраться</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section category-section" aria-labelledby="ideas-title">
+        <div class="container">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="section-kicker">Быстрый старт</p>
+              <h2 id="ideas-title">Что мутим?</h2>
+            </div>
+            <p>Нажмите на повод — останется выбрать дату.</p>
+          </div>
+
+          <div class="idea-grid">
+            <button class="idea-card idea-game" data-template="game" type="button">
+              <span class="idea-number">01</span>
+              <span class="idea-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <path d="M15 17h18a8 8 0 0 1 7.6 10.5l-2.1 6.2a4.6 4.6 0 0 1-7.6 1.8L27.5 32h-7l-3.4 3.5a4.6 4.6 0 0 1-7.6-1.8l-2.1-6.2A8 8 0 0 1 15 17Z" />
+                  <path d="M15 23v7M11.5 26.5h7M31 25h.1M35 29h.1" />
+                </svg>
+              </span>
+              <span class="idea-copy"><strong>Катка</strong><small>До победного</small></span>
+              <span class="idea-arrow">↗</span>
+            </button>
+
+            <button class="idea-card idea-cinema" data-template="cinema" type="button">
+              <span class="idea-number">02</span>
+              <span class="idea-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <path d="M8 15h32v23H8zM8 22h32M14 10l4 5M23 10l4 5M32 10l4 5" />
+                  <path d="m21 27 8 4-8 4v-8Z" />
+                </svg>
+              </span>
+              <span class="idea-copy"><strong>Кино</strong><small>И попкорн</small></span>
+              <span class="idea-arrow">↗</span>
+            </button>
+
+            <button class="idea-card idea-pub" data-template="pub" type="button">
+              <span class="idea-number">03</span>
+              <span class="idea-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <path d="M12 12h22v27H12zM34 18h4a5 5 0 0 1 5 5v6a5 5 0 0 1-5 5h-4M17 18v14M23 18v14M29 18v14" />
+                  <path d="M15 12V9h16v3" />
+                </svg>
+              </span>
+              <span class="idea-copy"><strong>По одной</strong><small>Ага, конечно</small></span>
+              <span class="idea-arrow">↗</span>
+            </button>
+
+            <button class="idea-card idea-other" data-template="other" type="button">
+              <span class="idea-number">04</span>
+              <span class="idea-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48">
+                  <path d="M24 6v36M6 24h36M11.3 11.3l25.4 25.4M36.7 11.3 11.3 36.7" />
+                </svg>
+              </span>
+              <span class="idea-copy"><strong>Свой план</strong><small>Без ограничений</small></span>
+              <span class="idea-arrow">↗</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section activities-section" id="activities" aria-labelledby="activities-title">
+        <div class="container">
+          <div class="section-heading activities-heading">
+            <div>
+              <p class="section-kicker">Календарь своих</p>
+              <h2 id="activities-title">Ближайшие движи</h2>
+            </div>
+            <button class="button button-primary desktop-section-create" data-action="create" type="button">
+              <span aria-hidden="true">＋</span> Добавить
+            </button>
+          </div>
+
+          <div class="toolbar">
+            <div class="filter-row" role="group" aria-label="Фильтр по типу активности">
+              <button class="filter-chip active" data-filter="all" type="button">Все</button>
+              <button class="filter-chip" data-filter="game" type="button">Игры</button>
+              <button class="filter-chip" data-filter="cinema" type="button">Кино</button>
+              <button class="filter-chip" data-filter="pub" type="button">Пиво</button>
+              <button class="filter-chip" data-filter="other" type="button">Другое</button>
+            </div>
+            <div class="time-toggle" role="group" aria-label="Будущие или прошедшие встречи">
+              <button class="active" data-time="upcoming" type="button">Впереди</button>
+              <button data-time="past" type="button">Архив</button>
+            </div>
+          </div>
+
+          <p class="results-meta" id="results-meta">Загружаем планы…</p>
+          <div class="events-grid" id="activities-grid"></div>
+        </div>
+      </section>
+
+      <section class="section crew-section" id="crew" aria-labelledby="crew-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Все на месте</p>
+              <h2 id="crew-title">Наша банда</h2>
+            </div>
+            <p>Одиннадцать человек. Согласовать один вечер. Испытание принято.</p>
+          </div>
+          <div class="friends-grid" id="friends-grid"></div>
+        </div>
+      </section>
+
+      <section class="section how-section" id="how-it-works" aria-labelledby="how-title">
+        <div class="container">
+          <div class="local-callout">
+            <div class="callout-copy">
+              <span class="local-badge"><i aria-hidden="true"></i> Локальный штаб</span>
+              <h2 id="how-title">Никакой магии.<br />Просто честный статичный сайт.</h2>
+              <p>
+                Планы и ответы хранятся только в вашем браузере. Создали встречу —
+                отправьте её ссылку в чат. Друг откроет снимок плана, отметится и
+                сможет прислать обновлённую ссылку обратно.
+              </p>
+              <div class="callout-actions">
+                <button class="button button-light" data-action="create" type="button">Создать план</button>
+                <button class="button button-outline-light" id="open-data-secondary" type="button">
+                  Резервная копия
+                </button>
+              </div>
+            </div>
+            <ol class="steps-list">
+              <li>
+                <span>01</span>
+                <div><strong>Накидайте план</strong><small>Что, где и когда.</small></div>
+              </li>
+              <li>
+                <span>02</span>
+                <div><strong>Киньте ссылку в чат</strong><small>Она содержит снимок встречи.</small></div>
+              </li>
+              <li>
+                <span>03</span>
+                <div><strong>Соберите ответы</strong><small>И напомните тем, кто молчит.</small></div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <a class="brand footer-brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span>СОБРАЛИСЬ<span class="brand-dot">.</span></span>
+        </a>
+        <p>Сделано для своих. Посторонним вход по дружбе.</p>
+        <button class="text-button" id="footer-data" type="button">Мои данные ↗</button>
+      </div>
+    </footer>
+
+    <div class="mobile-dock">
+      <button class="button button-primary" data-action="create" type="button">
+        <span aria-hidden="true">＋</span> Новый движ
+      </button>
+      <button class="dock-icon" id="mobile-user-button" type="button" aria-label="Выбрать участника">
+        <span class="mini-avatar" id="mobile-avatar" aria-hidden="true">Н</span>
+      </button>
+    </div>
+
+    <dialog class="modal event-modal" id="event-dialog" aria-labelledby="event-dialog-title">
+      <form class="modal-shell" id="event-form">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker" id="event-dialog-kicker">Новый движ</p>
+            <h2 id="event-dialog-title">Собираем своих</h2>
+          </div>
+          <button class="modal-close" data-close-dialog type="button" aria-label="Закрыть">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <input id="event-id" name="id" type="hidden" />
+
+          <fieldset class="type-fieldset">
+            <legend>Что делаем?</legend>
+            <div class="type-options">
+              <label class="type-option type-game">
+                <input type="radio" name="type" value="game" checked />
+                <span aria-hidden="true">⌘</span>
+                <strong>Играем</strong>
+              </label>
+              <label class="type-option type-cinema">
+                <input type="radio" name="type" value="cinema" />
+                <span aria-hidden="true">▶</span>
+                <strong>В кино</strong>
+              </label>
+              <label class="type-option type-pub">
+                <input type="radio" name="type" value="pub" />
+                <span aria-hidden="true">♨</span>
+                <strong>В бар</strong>
+              </label>
+              <label class="type-option type-other">
+                <input type="radio" name="type" value="other" />
+                <span aria-hidden="true">✦</span>
+                <strong>Другое</strong>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="event-title">Название <span>обязательно</span></label>
+            <input
+              id="event-title"
+              name="title"
+              type="text"
+              maxlength="80"
+              placeholder="Например, катка до победного"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="event-date">Дата <span>обязательно</span></label>
+              <input id="event-date" name="date" type="date" required />
+            </div>
+            <div class="field">
+              <label for="event-time">Время <span>обязательно</span></label>
+              <input id="event-time" name="time" type="time" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="event-place">Где встречаемся?</label>
+            <input
+              id="event-place"
+              name="place"
+              type="text"
+              maxlength="120"
+              placeholder="Discord, кинотеатр или любимый бар"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="field">
+            <label for="event-details">Детали</label>
+            <textarea
+              id="event-details"
+              name="details"
+              maxlength="500"
+              rows="3"
+              placeholder="Во что играем, что смотрим, где бронируем стол…"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="event-organizer">Кто мутит?</label>
+            <select id="event-organizer" name="organizer"></select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="button button-danger hidden" id="delete-event" type="button">Удалить</button>
+          <span class="modal-spacer"></span>
+          <button class="button button-ghost" data-close-dialog type="button">Отмена</button>
+          <button class="button button-primary" id="save-event" type="submit">Сохранить движ</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal member-modal" id="member-dialog" aria-labelledby="member-dialog-title">
+      <div class="modal-shell">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Перед голосованием</p>
+            <h2 id="member-dialog-title">А вы кто?</h2>
+          </div>
+          <button class="modal-close" data-close-dialog type="button" aria-label="Закрыть">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-intro">Выберите себя. Запомним только на этом устройстве.</p>
+          <div class="member-picker" id="member-picker"></div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="modal data-modal" id="data-dialog" aria-labelledby="data-dialog-title">
+      <div class="modal-shell">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Локальное хранилище</p>
+            <h2 id="data-dialog-title">Мои данные</h2>
+          </div>
+          <button class="modal-close" data-close-dialog type="button" aria-label="Закрыть">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="data-notice">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3 3.5 7.5V12c0 5.2 3.6 8 8.5 9 4.9-1 8.5-3.8 8.5-9V7.5L12 3Z" />
+              <path d="M9 12.2 11 14l4-4" />
+            </svg>
+            <div>
+              <strong>Всё остаётся в браузере</strong>
+              <p>Сайт ничего не отправляет на сервер. Сделайте копию, чтобы не потерять планы.</p>
+            </div>
+          </div>
+
+          <div class="data-actions-grid">
+            <button class="data-action" id="export-data" type="button">
+              <span class="data-action-icon">↓</span>
+              <span><strong>Скачать копию</strong><small>Все встречи в JSON-файле</small></span>
+            </button>
+            <button class="data-action" id="import-data" type="button">
+              <span class="data-action-icon">↑</span>
+              <span><strong>Загрузить копию</strong><small>Добавить и обновить встречи</small></span>
+            </button>
+          </div>
+          <input
+            id="import-file"
+            type="file"
+            accept=".json,application/json"
+            aria-label="Файл резервной копии"
+            hidden
+          />
+
+          <div class="storage-summary">
+            <span>В этом браузере</span>
+            <strong id="storage-summary">0 встреч</strong>
+          </div>
+
+          <div class="danger-zone">
+            <div>
+              <strong>Начать с чистого листа</strong>
+              <small>Все локальные встречи и ответы будут удалены.</small>
+            </div>
+            <button class="text-danger" id="reset-data" type="button">Очистить</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="modal share-modal" id="share-dialog" aria-labelledby="share-dialog-title">
+      <div class="modal-shell">
+        <div class="share-preview-accent" id="share-preview-accent"></div>
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Вам прислали план</p>
+            <h2 id="share-dialog-title">Добавить встречу?</h2>
+          </div>
+          <button class="modal-close" id="dismiss-share" type="button" aria-label="Закрыть">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="shared-event-preview">
+            <span id="shared-event-type">Игра</span>
+            <h3 id="shared-event-title">Название встречи</h3>
+            <p id="shared-event-meta">Дата · время · место</p>
+          </div>
+          <p class="modal-intro" id="shared-event-note">
+            Ссылка содержит снимок встречи. После добавления он сохранится только в этом браузере.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" id="cancel-share" type="button">Не сейчас</button>
+          <button class="button button-primary" id="import-shared-event" type="button">Добавить план</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="modal confirm-modal" id="confirm-dialog" aria-labelledby="confirm-title">
+      <div class="modal-shell">
+        <div class="modal-body">
+          <span class="confirm-icon" aria-hidden="true">!</span>
+          <h2 id="confirm-title">Вы уверены?</h2>
+          <p id="confirm-copy">Это действие нельзя отменить.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" id="confirm-cancel" type="button">Отмена</button>
+          <button class="button button-danger" id="confirm-yes" type="button">Удалить</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+      <span class="toast-icon" aria-hidden="true">✓</span>
+      <span id="toast-message">Готово</span>
+    </div>
+
+    <noscript>
+      <div class="noscript-message">
+        Для создания встреч и голосования нужен JavaScript. Включите его и обновите страницу.
+      </div>
+    </noscript>
+  </body>
+</html>
