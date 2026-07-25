@@ -11,14 +11,14 @@ const THEMES = {
 
 const FRIENDS = [
   { id: "denchik-banshe", name: "Дэнчик Баньше", initials: "ДБ", color: "#5edcff" },
-  { id: "egron4", name: "ЕГРОН4", initials: "Е4", color: "#c8ff3d" },
+  { id: "egron4", name: "ЕГРОН4", initials: "Е4", color: "var(--accent)" },
   { id: "lenchik", name: "Ленчик", initials: "Л", color: "#ff8f85" },
   { id: "klim", name: "Клим", initials: "К", color: "#b494ff" },
   { id: "andrey", name: "Андрей", initials: "А", color: "#ffb21c" },
   { id: "mot", name: "Мот", initials: "М", color: "#70e6b1" },
   { id: "vitek", name: "Витек", initials: "В", color: "#f17bb1" },
   { id: "nikita", name: "Никита", initials: "Н", color: "#5edcff" },
-  { id: "denchik-andreev", name: "Дэнчик Андреев", initials: "ДА", color: "#c8ff3d" },
+  { id: "denchik-andreev", name: "Дэнчик Андреев", initials: "ДА", color: "var(--accent)" },
   { id: "zheka", name: "Жека", initials: "Ж", color: "#ff9f43" },
   { id: "serega", name: "Серёга", initials: "С", color: "#8eafff" },
 ];
@@ -756,7 +756,7 @@ function renderRsvpButtons(container, activity, currentStatus) {
 
 function renderAvatarStack(container, friendIds, activityType) {
   container.replaceChildren();
-  container.style.setProperty("--card-bg", container.closest(".next-ticket") ? "#c8ff3d" : "#171a1f");
+  container.style.setProperty("--card-bg", container.closest(".next-ticket") ? "var(--accent)" : "#171a1f");
 
   if (!friendIds.length) {
     const placeholder = document.createElement("span");
