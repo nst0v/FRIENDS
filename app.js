@@ -1,5 +1,13 @@
 const STORAGE_KEY = "sobralis-state-v1";
 const STATE_VERSION = 1;
+const THEME_STORAGE_KEY = "sobralis-theme-v1";
+const THEMES = {
+  lime: { label: "Лаймовый", browserColor: "#0d0f12" },
+  violet: { label: "Фиолетовый", browserColor: "#0d0f12" },
+  yellow: { label: "Жёлтый", browserColor: "#0d0f12" },
+  orange: { label: "Оранжевый", browserColor: "#0d0f12" },
+  smoke: { label: "Смоки", browserColor: "#111315" },
+};
 
 const FRIENDS = [
   { id: "denchik-banshe", name: "Дэнчик Баньше", initials: "ДБ", color: "#5edcff" },
@@ -32,7 +40,7 @@ const TYPES = {
     color: "#ffb21c",
   },
   other: {
-    label: "Свой план",
+    label: "Другое",
     shortLabel: "Собираемся",
     color: "#b494ff",
   },
@@ -41,39 +49,39 @@ const TYPES = {
 const TEMPLATES = {
   game: {
     type: "game",
-    title: "Катка до победного",
-    place: "Discord / у кого-нибудь дома",
-    details: "Выбираем игру и выясняем, кто опять всё заруинил.",
+    title: "Игровой вечер",
+    place: "Discord или дома",
+    details: "Выберите игру и удобный формат встречи.",
   },
   cinema: {
     type: "cinema",
-    title: "Кино и попкорн",
-    place: "Кинотеатр — решим в чате",
-    details: "Премьера, классика или фильм настолько плохой, что уже хороший.",
+    title: "Поход в кино",
+    place: "Кинотеатр",
+    details: "Выберите фильм, сеанс и кинотеатр.",
   },
   pub: {
     type: "pub",
-    title: "По одной, ага",
-    place: "Любимый бар",
-    details: "Бар, паб или стратегический запас у кого-нибудь дома.",
+    title: "Встреча в баре",
+    place: "Бар",
+    details: "Выберите место и удобное время.",
   },
   other: {
     type: "other",
     title: "",
     place: "",
-    details: "Настолки, шашлык, прогулка или внезапный великий план.",
+    details: "Настольные игры, прогулка, поездка или другой формат.",
   },
 };
 
 const RANDOM_IDEAS = [
-  { type: "game", title: "Турнир без права на лив", details: "Берём игру, собираем команды и играем до финального «ещё одну»." },
-  { type: "game", title: "Кооперативный вечер", details: "Сегодня мы вроде бы одна команда. Проверим, надолго ли." },
-  { type: "cinema", title: "Плохое кино, хорошая компания", details: "Выбираем фильм с сомнительным рейтингом и комментируем как профессионалы." },
-  { type: "cinema", title: "Ночная премьера", details: "Большой экран, много попкорна и никаких спойлеров в чате." },
-  { type: "pub", title: "Проверка нового бара", details: "Разведывательная вылазка. Стол бронируем заранее — мы учимся." },
-  { type: "pub", title: "По одной после работы", details: "Классическая формулировка, последствия которой всем известны." },
-  { type: "other", title: "Шашлык и великие планы", details: "Находим мангал, покупаем всё нужное и не забываем уголь." },
-  { type: "other", title: "Настолки без дипломатии", details: "Дружба дружбой, а победные очки — отдельно." },
+  { type: "game", title: "Игровой турнир", details: "Выберите игру, составы команд и формат турнира." },
+  { type: "game", title: "Кооперативный вечер", details: "Выберите совместную игру и время начала." },
+  { type: "cinema", title: "Вечер в кино", details: "Выберите фильм и подходящий сеанс." },
+  { type: "cinema", title: "Ночная премьера", details: "Проверьте расписание и выберите кинотеатр." },
+  { type: "pub", title: "Новый бар", details: "Выберите место и забронируйте стол." },
+  { type: "pub", title: "Встреча после работы", details: "Выберите удобное место и время." },
+  { type: "other", title: "Шашлыки", details: "Укажите место и список необходимых вещей." },
+  { type: "other", title: "Вечер настольных игр", details: "Выберите игры и место встречи." },
 ];
 
 const ICONS = {
@@ -137,6 +145,10 @@ const elements = {
   headerUserName: document.querySelector("#header-user-name"),
   headerAvatar: document.querySelector("#header-avatar"),
   mobileAvatar: document.querySelector("#mobile-avatar"),
+  themeToggle: document.querySelector("#theme-toggle"),
+  themeMenu: document.querySelector("#theme-menu"),
+  themeOptions: [...document.querySelectorAll("[data-theme-value]")],
+  browserThemeColor: document.querySelector('meta[name="theme-color"]'),
   eventDialog: document.querySelector("#event-dialog"),
   eventForm: document.querySelector("#event-form"),
   eventDialogKicker: document.querySelector("#event-dialog-kicker"),
@@ -165,13 +177,14 @@ const elements = {
 init();
 
 function init() {
+  applyTheme(document.documentElement.dataset.theme, false);
   populateOrganizerOptions();
   bindEvents();
   renderAll();
   window.setTimeout(checkSharedHash, 80);
 
   if (!storageAvailable) {
-    showToast("Браузер запретил хранилище — изменения останутся до перезагрузки", "!");
+    showToast("Не удалось загрузить данные", "!");
   }
 }
 
@@ -199,7 +212,7 @@ function bindEvents() {
     const idea = RANDOM_IDEAS[Math.floor(Math.random() * RANDOM_IDEAS.length)];
     const base = TEMPLATES[idea.type];
     openEventDialog(null, { ...base, ...idea });
-    showToast("Идея выбрана случайно. Судьба решила.", "✦");
+    showToast("Вариант выбран", "✦");
   });
 
   document.querySelectorAll("[data-filter]").forEach((button) => {
@@ -248,8 +261,33 @@ function bindEvents() {
     });
   });
 
-  ["#data-button", "#open-data-secondary", "#footer-data"].forEach((selector) => {
+  ["#data-button", "#footer-data"].forEach((selector) => {
     document.querySelector(selector).addEventListener("click", openDataDialog);
+  });
+
+  elements.themeToggle.addEventListener("click", () => {
+    setThemeMenuOpen(elements.themeMenu.hidden);
+  });
+
+  elements.themeOptions.forEach((button) => {
+    button.addEventListener("click", () => {
+      const theme = applyTheme(button.dataset.themeValue);
+      setThemeMenuOpen(false);
+      showToast(`Тема «${THEMES[theme].label}» включена`, "✦");
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".theme-control")) {
+      setThemeMenuOpen(false);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !elements.themeMenu.hidden) {
+      setThemeMenuOpen(false);
+      elements.themeToggle.focus();
+    }
   });
 
   elements.eventForm.addEventListener("submit", saveEventFromForm);
@@ -272,6 +310,11 @@ function bindEvents() {
   });
 
   window.addEventListener("storage", (event) => {
+    if (event.key === THEME_STORAGE_KEY) {
+      applyTheme(event.newValue, false);
+      return;
+    }
+
     if (event.key !== STORAGE_KEY || !event.newValue) return;
 
     try {
@@ -279,7 +322,7 @@ function bindEvents() {
       if (!incoming) return;
       state = incoming;
       renderAll();
-      showToast("Планы обновились из другой вкладки");
+      showToast("Встречи обновились из другой вкладки");
     } catch {
       // Ignore malformed changes from another tab.
     }
@@ -288,12 +331,43 @@ function bindEvents() {
   window.addEventListener("hashchange", checkSharedHash);
 }
 
+function applyTheme(theme, persist = true) {
+  const nextTheme = THEMES[theme] ? theme : "lime";
+  document.documentElement.dataset.theme = nextTheme;
+  elements.browserThemeColor.content = THEMES[nextTheme].browserColor;
+  elements.themeToggle.setAttribute("aria-label", `Выбрать цветовую тему. Сейчас: ${THEMES[nextTheme].label}`);
+
+  elements.themeOptions.forEach((button) => {
+    button.setAttribute("aria-checked", String(button.dataset.themeValue === nextTheme));
+  });
+
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    } catch {
+      // Theme still works for the current page if storage is unavailable.
+    }
+  }
+
+  return nextTheme;
+}
+
+function setThemeMenuOpen(isOpen) {
+  elements.themeMenu.hidden = !isOpen;
+  elements.themeToggle.setAttribute("aria-expanded", String(isOpen));
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = normalizeState(JSON.parse(raw));
-      if (parsed) return parsed;
+      if (parsed) {
+        if (migrateDefaultCopy(parsed)) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        }
+        return parsed;
+      }
     }
 
     const fresh = createInitialState();
@@ -320,6 +394,54 @@ function normalizeState(raw) {
   };
 }
 
+function migrateDefaultCopy(savedState) {
+  const replacements = {
+    "demo-game-night": {
+      oldTitle: "Катка до победного",
+      title: "Игровой вечер",
+      oldPlace: "Discord / у Никиты",
+      place: "Discord или дома",
+      oldDetails: "Выбираем игру в чате. Проигравшие организуют следующую встречу.",
+      details: "Выберите игру и подтвердите участие.",
+    },
+    "demo-cinema-night": {
+      oldTitle: "Плохое кино, хорошая компания",
+      title: "Вечер в кино",
+      oldPlace: "Кинотеатр — решим в чате",
+      place: "Кинотеатр",
+      oldDetails: "Сначала выбираем фильм, потом спорим, кто выбрал его хуже всех.",
+      details: "Выберите фильм, сеанс и кинотеатр.",
+    },
+    "demo-pub-night": {
+      oldTitle: "По одной, ага",
+      title: "Встреча в баре",
+      oldPlace: "Бар выберем голосованием",
+      place: "Бар",
+      oldDetails: "Без сложной повестки. Просто увидеться и обсудить великие планы.",
+      details: "Выберите место и подтвердите участие.",
+    },
+  };
+  let changed = false;
+
+  savedState.activities.forEach((activity) => {
+    const replacement = replacements[activity.id];
+    if (!replacement) return;
+
+    [
+      ["title", "oldTitle"],
+      ["place", "oldPlace"],
+      ["details", "oldDetails"],
+    ].forEach(([field, oldField]) => {
+      if (activity[field] === replacement[oldField]) {
+        activity[field] = replacement[field];
+        changed = true;
+      }
+    });
+  });
+
+  return changed;
+}
+
 function createInitialState() {
   const now = new Date();
   const createdAt = now.toISOString();
@@ -331,12 +453,12 @@ function createInitialState() {
     activities: [
       {
         id: "demo-game-night",
-        title: "Катка до победного",
+        title: "Игровой вечер",
         type: "game",
         date: toDateInput(addDays(now, 2)),
         time: "20:30",
-        place: "Discord / у Никиты",
-        details: "Выбираем игру в чате. Проигравшие организуют следующую встречу.",
+        place: "Discord или дома",
+        details: "Выберите игру и подтвердите участие.",
         organizer: "nikita",
         responses: {
           nikita: "yes",
@@ -350,12 +472,12 @@ function createInitialState() {
       },
       {
         id: "demo-cinema-night",
-        title: "Плохое кино, хорошая компания",
+        title: "Вечер в кино",
         type: "cinema",
         date: toDateInput(addDays(now, 5)),
         time: "19:40",
-        place: "Кинотеатр — решим в чате",
-        details: "Сначала выбираем фильм, потом спорим, кто выбрал его хуже всех.",
+        place: "Кинотеатр",
+        details: "Выберите фильм, сеанс и кинотеатр.",
         organizer: "lenchik",
         responses: {
           lenchik: "yes",
@@ -368,12 +490,12 @@ function createInitialState() {
       },
       {
         id: "demo-pub-night",
-        title: "По одной, ага",
+        title: "Встреча в баре",
         type: "pub",
         date: toDateInput(addDays(now, 8)),
         time: "20:00",
-        place: "Бар выберем голосованием",
-        details: "Без сложной повестки. Просто увидеться и обсудить великие планы.",
+        place: "Бар",
+        details: "Выберите место и подтвердите участие.",
         organizer: "zheka",
         responses: {
           zheka: "yes",
@@ -395,7 +517,7 @@ function persistState() {
     return true;
   } catch {
     storageAvailable = false;
-    showToast("Не удалось сохранить изменения в браузере", "!");
+    showToast("Не удалось сохранить изменения", "!");
     return false;
   }
 }
@@ -427,9 +549,9 @@ function renderHero() {
     elements.nextEvent.innerHTML = `
       <div class="ticket-empty">
         <span class="ticket-empty-icon">✦</span>
-        <h2>Пока тихо</h2>
-        <p>Подозрительно тихо. Создайте первый движ, пока все не разошлись.</p>
-        <button class="button button-dark" data-action="create" type="button">Исправить это</button>
+        <h2>Встреч пока нет</h2>
+        <p>Создайте первую встречу и отправьте приглашение друзьям.</p>
+        <button class="button button-dark" data-action="create" type="button">Создать встречу</button>
       </div>`;
     return;
   }
@@ -467,7 +589,7 @@ function renderHero() {
           data-status="yes"
           data-event-id="${activity.id}"
           type="button"
-        >${currentStatus === "yes" ? "Вы в деле ✓" : "Я в деле"}</button>
+        >${currentStatus === "yes" ? "Вы идёте ✓" : "Я иду"}</button>
       </div>
     </div>`;
 
@@ -476,9 +598,9 @@ function renderHero() {
   elements.nextEvent.querySelector("[data-ticket-month]").textContent = getMonthName(date, "long");
   elements.nextEvent.querySelector("[data-ticket-relative]").textContent = `${formatRelative(activity)} · ${activity.time}`;
   elements.nextEvent.querySelector("[data-ticket-title]").textContent = activity.title;
-  elements.nextEvent.querySelector("[data-ticket-place]").textContent = activity.place || "Место решим в чате";
+  elements.nextEvent.querySelector("[data-ticket-place]").textContent = activity.place || "Место не указано";
   elements.nextEvent.querySelector("[data-ticket-going-label]").textContent =
-    going.length > 0 ? `${going.length} ${plural(going.length, "человек идёт", "человека идут", "человек идут")}` : "Пока никто не отметился";
+    going.length > 0 ? `${going.length} ${plural(going.length, "человек идёт", "человека идут", "человек идут")}` : "Никто не подтвердил участие";
   renderAvatarStack(elements.nextEvent.querySelector("[data-ticket-avatars]"), going, activity.type);
 }
 
@@ -505,15 +627,15 @@ function renderActivities() {
     empty.innerHTML = `
       <div>
         <span class="empty-state-icon" aria-hidden="true">${filtered ? "⌁" : "✦"}</span>
-        <h3>${filtered ? "Здесь пока пусто" : ui.time === "past" ? "Архив ещё пуст" : "Подозрительно тихо"}</h3>
+        <h3>${filtered ? "Нет подходящих встреч" : ui.time === "past" ? "Архив пуст" : "Встреч пока нет"}</h3>
         <p>${
           filtered
-            ? "Попробуйте другой фильтр или придумайте новый повод."
+            ? "Выберите другой фильтр или создайте новую встречу."
             : ui.time === "past"
-              ? "Прошедшие встречи появятся здесь сами."
-              : "Создайте первый движ, пока все не разошлись по своим делам."
+              ? "Прошедшие встречи появятся здесь."
+              : "Создайте встречу и отправьте приглашение друзьям."
         }</p>
-        ${ui.time === "upcoming" ? '<button class="button button-primary" data-action="create" type="button">Создать движ</button>' : ""}
+        ${ui.time === "upcoming" ? '<button class="button button-primary" data-action="create" type="button">Создать встречу</button>' : ""}
       </div>`;
     elements.eventsGrid.append(empty);
     return;
@@ -567,9 +689,9 @@ function createEventCard(activity) {
         data-card-action="share"
         data-event-id="${activity.id}"
         type="button"
-        aria-label="Кинуть встречу в чат"
+        aria-label="Поделиться встречей"
       >
-        ${ICONS.share}<span>Кинуть в чат</span>
+        ${ICONS.share}<span>Поделиться</span>
       </button>
       <button
         class="card-action"
@@ -597,12 +719,12 @@ function createEventCard(activity) {
   card.querySelector("[data-card-month]").textContent = getMonthName(date, "short");
   card.querySelector("[data-card-title]").textContent = activity.title;
   card.querySelector("[data-card-time]").textContent = activity.time;
-  card.querySelector("[data-card-place]").textContent = activity.place || "Решим в чате";
-  card.querySelector("[data-card-details]").textContent = activity.details || "Без длинного описания. Просто собираемся.";
+  card.querySelector("[data-card-place]").textContent = activity.place || "Место не указано";
+  card.querySelector("[data-card-details]").textContent = activity.details || "Описание не указано.";
   card.querySelector("[data-card-going]").textContent =
-    yes.length > 0 ? `${yes.length} ${plural(yes.length, "в деле", "в деле", "в деле")}` : "Никто не ответил";
+    yes.length > 0 ? `${yes.length} ${plural(yes.length, "идёт", "идут", "идут")}` : "Никто не ответил";
   card.querySelector("[data-card-maybe]").textContent =
-    maybe.length > 0 ? `${maybe.length} ${plural(maybe.length, "думает", "думают", "думают")}` : "Ждём остальных";
+    maybe.length > 0 ? `${maybe.length} ${plural(maybe.length, "не уверен", "не уверены", "не уверены")}` : "Ожидаются ответы";
 
   renderAvatarStack(card.querySelector("[data-card-avatars]"), yes, activity.type);
   renderRsvpButtons(card.querySelector("[data-card-rsvp]"), activity, currentStatus);
@@ -612,9 +734,9 @@ function createEventCard(activity) {
 
 function renderRsvpButtons(container, activity, currentStatus) {
   const options = [
-    ["yes", "В деле"],
-    ["maybe", "Думаю"],
-    ["no", "Пас"],
+    ["yes", "Иду"],
+    ["maybe", "Возможно"],
+    ["no", "Не смогу"],
   ];
   const friend = getFriend(state.currentUser);
 
@@ -640,7 +762,7 @@ function renderAvatarStack(container, friendIds, activityType) {
     const placeholder = document.createElement("span");
     placeholder.className = "stack-avatar stack-more";
     placeholder.textContent = "…";
-    placeholder.title = "Пока никто";
+    placeholder.title = "Нет ответов";
     container.append(placeholder);
     return;
   }
@@ -677,7 +799,7 @@ function renderFriends() {
     card.dataset.selectFriend = friend.id;
     card.style.setProperty("--friend-accent", friend.color);
     card.setAttribute("aria-pressed", String(friend.id === state.currentUser));
-    card.setAttribute("aria-label", `${friend.name}. ${count ? `${count} встреч впереди.` : "Пока без планов."} Выбрать себя.`);
+    card.setAttribute("aria-label", `${friend.name}. ${count ? `${count} встреч впереди.` : "Нет предстоящих встреч."} Выбрать себя.`);
 
     const avatar = document.createElement("span");
     avatar.className = "friend-avatar";
@@ -692,7 +814,7 @@ function renderFriends() {
         ? "ЭТО ВЫ"
         : count
           ? `${count} ${plural(count, "ВСТРЕЧА", "ВСТРЕЧИ", "ВСТРЕЧ")}`
-          : "ЖДЁТ ПЛАНОВ";
+          : "НЕТ ОТВЕТОВ";
 
     card.append(avatar, name, status);
     fragment.append(card);
@@ -752,9 +874,9 @@ function openEventDialog(eventId = null, preset = null) {
   document.querySelector("#event-title").setCustomValidity("");
   document.querySelector("#event-id").value = "";
   elements.deleteEvent.classList.add("hidden");
-  elements.eventDialogKicker.textContent = "Новый движ";
-  elements.eventDialogTitle.textContent = "Собираем своих";
-  document.querySelector("#save-event").textContent = "Сохранить движ";
+  elements.eventDialogKicker.textContent = "Новая встреча";
+  elements.eventDialogTitle.textContent = "Создание встречи";
+  document.querySelector("#save-event").textContent = "Сохранить встречу";
 
   const tomorrow = addDays(new Date(), 1);
   document.querySelector("#event-date").value = toDateInput(tomorrow);
@@ -775,7 +897,7 @@ function openEventDialog(eventId = null, preset = null) {
     document.querySelector("#event-organizer").value = activity.organizer;
     elements.deleteEvent.classList.remove("hidden");
     elements.eventDialogKicker.textContent = "Редактирование";
-    elements.eventDialogTitle.textContent = "Правим план";
+    elements.eventDialogTitle.textContent = "Редактирование встречи";
     document.querySelector("#save-event").textContent = "Сохранить изменения";
   } else if (preset) {
     document.querySelector(`input[name="type"][value="${preset.type}"]`).checked = true;
@@ -794,7 +916,7 @@ function saveEventFromForm(event) {
   const titleInput = document.querySelector("#event-title");
   const title = String(formData.get("title") || "").trim();
 
-  titleInput.setCustomValidity(title ? "" : "Придумайте короткое название встречи.");
+  titleInput.setCustomValidity(title ? "" : "Укажите название встречи.");
   if (!elements.eventForm.reportValidity()) return;
 
   const existingId = String(formData.get("id") || "");
@@ -836,7 +958,7 @@ function saveEventFromForm(event) {
   persistState();
   closeDialog(elements.eventDialog);
   renderAll();
-  showToast(existing ? "План обновлён" : "Движ готов. Теперь киньте его в чат.");
+  showToast(existing ? "Встреча обновлена" : "Встреча создана");
 }
 
 async function deleteCurrentEvent() {
@@ -845,8 +967,8 @@ async function deleteCurrentEvent() {
   if (!activity) return;
 
   const confirmed = await askConfirmation(
-    "Удалить этот движ?",
-    `«${activity.title}» исчезнет из этого браузера.`,
+    "Удалить эту встречу?",
+    `«${activity.title}» будет удалена.`,
     "Удалить",
   );
   if (!confirmed) return;
@@ -896,9 +1018,9 @@ function setRsvp(eventId, status) {
   renderAll();
 
   const messages = {
-    yes: "Отмечено: вы в деле. Ответ сохранён только у вас.",
-    maybe: "Отмечено: вы думаете. Не забудьте определиться.",
-    no: "Отмечено: в этот раз пас.",
+    yes: "Ответ сохранён: вы идёте.",
+    maybe: "Ответ сохранён: возможно.",
+    no: "Ответ сохранён: вы не сможете прийти.",
   };
   showToast(currentStatus === status ? "Ответ снят" : messages[status]);
 }
@@ -930,8 +1052,8 @@ async function shareActivity(activity) {
     }
   }
 
-  const copied = await copyText(`${text}\n\nОткрыть план: ${url}`);
-  showToast(copied ? "План скопирован — кидайте в чат" : "Не удалось скопировать ссылку", copied ? "✓" : "!");
+  const copied = await copyText(`${text}\n\nОткрыть встречу: ${url}`);
+  showToast(copied ? "Ссылка скопирована" : "Не удалось скопировать ссылку", copied ? "✓" : "!");
 }
 
 function buildShareUrl(activity) {
@@ -959,13 +1081,13 @@ function checkSharedHash() {
     elements.sharedTitle.textContent = activity.title;
     elements.sharedMeta.textContent = `${formatFullDate(activity)} · ${activity.time} · ${activity.place || "место решат в чате"}`;
     elements.sharedNote.textContent = existing
-      ? "Эта встреча уже есть у вас. Объединим ответы из ссылки с вашей версией."
-      : "Ссылка содержит снимок встречи. После добавления он сохранится только в этом браузере.";
-    elements.importSharedButton.textContent = existing ? "Объединить ответы" : "Добавить план";
+      ? "Эта встреча уже добавлена. Ответы будут объединены."
+      : "Проверьте дату, время и место перед добавлением.";
+    elements.importSharedButton.textContent = existing ? "Объединить ответы" : "Добавить встречу";
     openDialog(elements.shareDialog);
   } catch {
     clearShareHash();
-    showToast("Эта ссылка на встречу повреждена или устарела", "!");
+    showToast("Не удалось открыть приглашение", "!");
   }
 }
 
@@ -998,7 +1120,7 @@ function importSharedEvent() {
     button.classList.toggle("active", button.dataset.time === "upcoming");
   });
   renderAll();
-  showToast(index >= 0 ? "Ответы из ссылки объединены" : "Встреча добавлена в ваш штаб");
+  showToast(index >= 0 ? "Ответы объединены" : "Встреча добавлена");
   document.querySelector("#activities").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -1023,7 +1145,7 @@ function downloadCalendar(activity) {
   const timezone = /^[A-Za-z0-9_+\-/]{1,80}$/.test(activity.timezone || "") ? activity.timezone : "";
   const timezoneParam = timezone ? `;TZID=${timezone}` : "";
   const attendees = getResponders(activity, "yes").map((id) => getFriend(id)?.name).filter(Boolean).join(", ");
-  const description = [activity.details, attendees ? `В деле: ${attendees}` : ""].filter(Boolean).join("\\n\\n");
+  const description = [activity.details, attendees ? `Участвуют: ${attendees}` : ""].filter(Boolean).join("\\n\\n");
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
   const ics = [
@@ -1124,8 +1246,8 @@ async function importData() {
 
 async function resetData() {
   const confirmed = await askConfirmation(
-    "Очистить все планы?",
-    "Встречи и ответы исчезнут из этого браузера. Сначала можно скачать копию.",
+    "Очистить все встречи?",
+    "Все встречи и ответы будут удалены. Перед удалением можно скачать копию.",
     "Очистить всё",
   );
   if (!confirmed) return;
@@ -1134,7 +1256,7 @@ async function resetData() {
   persistState();
   closeDialog(elements.dataDialog);
   renderAll();
-  showToast("Локальные планы очищены", "×");
+  showToast("Все встречи удалены", "×");
 }
 
 function askConfirmation(title, copy, buttonLabel) {
